@@ -9,12 +9,23 @@
   .container { max-width: 500px; margin: 20px auto; background: #fff; padding: 20px 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
   h1 { text-align: center; color: #333; font-size: 1.5em; margin-bottom: 20px; }
   label { display: block; font-weight: 600; margin-top: 15px; color: #555; }
-  input, select, button { margin-top: 8px; padding: 12px; width: 100%; border: 1px solid #ccc; border-radius: 8px; font-size: 1em; }
+  input, select, button {
+    margin-top: 8px;
+    padding: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+  }
   input:focus, select:focus { border-color: #007BFF; outline: none; }
   button { background-color: #007BFF; color: #fff; font-weight: 600; border: none; cursor: pointer; transition: background 0.3s; }
   button:hover { background-color: #0056b3; }
   #result { margin-top: 25px; padding: 15px; background: #e0f7fa; border-radius: 10px; font-size: 1.2em; font-weight: bold; text-align: center; color: #007BFF; white-space: pre-line; }
-  @media (max-width: 480px) { .container { padding: 15px 20px; } h1 { font-size: 1.3em; } }
+  @media (max-width: 480px) { 
+    .container { padding: 15px 20px; } 
+    h1 { font-size: 1.3em; } 
+  }
 </style>
 </head>
 <body>
@@ -57,6 +68,7 @@
 </form>
 <div id="result"></div>
 </div>
+
 <script>
 function toggleHousingInput() {
   const exp = document.getElementById('housingExperience').value;
@@ -91,7 +103,7 @@ function calculateScore() {
 
   const today = new Date();
 
-  // 무주택 기간 점수
+  // 무주택 기간 점수 (최대 32점)
   let housingYears = today.getFullYear() - startDate.getFullYear();
   let housingMonths = today.getMonth() - startDate.getMonth();
   if (housingMonths < 0) { housingYears--; housingMonths += 12; }
@@ -103,13 +115,9 @@ function calculateScore() {
   if (subMonths < 0) { subYears--; subMonths += 12; }
   const subScore = Math.min(subYears + Math.floor(subMonths / 12), 17);
 
-  // 부양가족 점수 (최대 35점)
+  // 부양가족 점수 (본인 제외, 최대 35점)
   const familyScore = Math.min(familyCount * 5, 35);
 
   const totalScore = housingScore + subScore + familyScore;
 
-  document.getElementById('result').innerText = `예상 청약 가점: ${totalScore}점\n(무주택: ${housingScore}, 통장: ${subScore}, 가족: ${familyScore})`;
-}
-</script>
-</body>
-</html>
+  document.getElementById('result').innerText = `예상 청약 가점: ${totalScore}점\n(무주택: ${housingSc
