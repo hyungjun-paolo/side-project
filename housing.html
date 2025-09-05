@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!doctype html&gt;</p>
+<p class="p1">&lt;html lang="ko"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="utf-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width,initial-scale=1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;간편 청약 가점 계산기&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body{font-family:'Noto Sans KR',sans-serif;margin:0;padding:16px;background:#fafafa;color:#111;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.container{max-width:600px;margin:0 auto;background:#fff;padding:20px;border-radius:12px;</p>
+<p class="p1"><span class="Apple-converted-space">               </span>box-shadow:0 4px 12px rgba(0,0,0,0.05);}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>h1{font-size:1.4rem;margin-bottom:12px;text-align:center;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>label{display:block;margin-top:12px;font-weight:500;font-size:0.9rem;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>input[type=date],input[type=number]{width:100%;padding:10px;border:1px solid #ccc;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>border-radius:8px;font-size:1rem;margin-top:4px;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button{margin-top:18px;width:100%;padding:12px;font-size:1rem;border:0;border-radius:8px;</p>
+<p class="p1"><span class="Apple-converted-space">           </span>background:#0b66ff;color:#fff;cursor:pointer;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>button:active{background:#084ccc;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.result{margin-top:20px;padding:16px;background:#f0f7ff;border-radius:8px;text-align:center;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.result strong{display:block;font-size:1.4rem;margin-bottom:6px;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>table{width:100%;border-collapse:collapse;margin-top:12px;font-size:0.9rem;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>th,td{padding:8px;border-bottom:1px solid #eee;text-align:center;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>@media (max-width:480px){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>.container{padding:16px;}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>h1{font-size:1.2rem;}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>input,button{font-size:0.95rem;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;간편 청약 가점 계산기&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;form id="calcForm" onsubmit="event.preventDefault(); calculate();"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;생년월일</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input id="birth" type="date" required&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;혼인일 (선택)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input id="married" type="date"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;무주택 시작일 직접 입력 (선택)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input id="customStart" type="date"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;청약통장 가입일</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input id="joinDate" type="date" required&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;부양가족 수 (본인 제외)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input id="dependents" type="number" min="0" value="0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button type="submit"&gt;계산하기&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/form&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="output" class="result" style="display:none;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;strong id="totalP"&gt;&lt;/strong&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="detail"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;table&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;tr&gt;&lt;th&gt;항목&lt;/th&gt;&lt;th&gt;기간/수&lt;/th&gt;&lt;th&gt;점수&lt;/th&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;tr&gt;&lt;td&gt;무주택 기간&lt;/td&gt;&lt;td id="mujuY"&gt;&lt;/td&gt;&lt;td id="mujuP"&gt;&lt;/td&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;tr&gt;&lt;td&gt;부양가족&lt;/td&gt;&lt;td id="famCount"&gt;&lt;/td&gt;&lt;td id="famP"&gt;&lt;/td&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;tr&gt;&lt;td&gt;청약통장&lt;/td&gt;&lt;td id="joinY"&gt;&lt;/td&gt;&lt;td id="joinP"&gt;&lt;/td&gt;&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/table&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">function yearsBetween(start, end){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!start||!end) return 0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const s=new Date(start), e=new Date(end);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(e&lt;s) return 0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let y=e.getFullYear()-s.getFullYear();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(e.getMonth()&lt;s.getMonth()||(e.getMonth()===s.getMonth()&amp;&amp;e.getDate()&lt;s.getDate())) y--;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return y&lt;0?0:y;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function calculate(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const birth=document.getElementById('birth').value;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const married=document.getElementById('married').value;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const custom=document.getElementById('customStart').value;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const join=document.getElementById('joinDate').value;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const deps=parseInt(document.getElementById('dependents').value||'0',10);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const todayStr=new Date().toISOString().slice(0,10);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>let mujuStart="";</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(custom) mujuStart=custom;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>else if(married) mujuStart=married;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>else if(birth){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const b=new Date(birth);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const thirtieth=new Date(b.getFullYear()+30,b.getMonth(),b.getDate());</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mujuStart=thirtieth.toISOString().slice(0,10);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const mujuYears=yearsBetween(mujuStart,todayStr);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const mujuPoints=Math.min(32,mujuYears*2);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const famPoints=Math.min(35,deps*5);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const joinYears=yearsBetween(join,todayStr);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const joinPoints=(joinYears&gt;=15)?17:joinYears;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const total=mujuPoints+famPoints+joinPoints;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('output').style.display='block';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('totalP').textContent='총점: '+total+'점';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('detail').textContent=</p>
+<p class="p1"><span class="Apple-converted-space">    </span>`무주택 ${mujuYears}년(${mujuPoints}점) · 부양가족 ${deps}명(${famPoints}점) · 가입 ${joinYears}년(${joinPoints}점)`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('mujuY').textContent=mujuYears+'년';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('mujuP').textContent=mujuPoints+'점';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('famCount').textContent=deps+'명';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('famP').textContent=famPoints+'점';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('joinY').textContent=joinYears+'년';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('joinP').textContent=joinPoints+'점';</p>
+<p class="p1">}</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
