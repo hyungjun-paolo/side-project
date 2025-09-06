@@ -109,15 +109,8 @@ function calculateScore() {
   let startDate;
 
   if (housingExp === 'none') {
-    if (maritalStatus === 'married') {
-      const marriageDateInput = document.getElementById('marriageDate').value;
-      if (!marriageDateInput) { alert('혼인신고일을 입력하세요'); return; }
-      const marriageDate = new Date(marriageDateInput);
-      // 주택 경험 없음: 무주택 시작일 = 만30세 기준일과 혼인신고일 중 **더 이른 날짜**
-      startDate = marriageDate < age30Date ? marriageDate : age30Date;
-    } else {
-      startDate = age30Date; // 미혼이면 만30세 기준
-    }
+    // 주택 경험 없음 → 무주택 시작일은 **무조건 만 30세 기준일**
+    startDate = age30Date;
   } else {
     const noHouseDate = new Date(document.getElementById('noHouseDate').value);
     if (!noHouseDate) { alert('무주택자가 된 날짜를 입력하세요'); return; }
