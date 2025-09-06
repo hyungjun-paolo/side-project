@@ -10,19 +10,8 @@
   h1 { text-align: center; color: #333; font-size: 1.5em; margin-bottom: 20px; }
   label { display: block; font-weight: 600; margin-top: 15px; color: #555; }
 
-  /* 공통 스타일 */
-  input[type="text"], input[type="number"] {
-    margin-top: 8px;
-    padding: 12px;
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1em;
-  }
-
-  /* 날짜 입력: 캘린더 아이콘 유지 */
-  input[type="date"] {
+  /* 공통 입력 스타일 */
+  input[type="text"], input[type="number"], input[type="date"], select {
     margin-top: 8px;
     padding: 12px;
     width: 100%;
@@ -34,13 +23,6 @@
 
   /* select: 드롭다운 화살표 커스텀 */
   select {
-    margin-top: 8px;
-    padding: 12px;
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1em;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -92,8 +74,8 @@
 </select>
 
 <div id="housingInput" style="display:none;">
-  <label>주택 구입일 (주택 경험 있는 경우)</label>
-  <input type="date" id="purchaseDate">
+  <label>무주택자가 된 날짜 (마지막 주택 처분일)</label>
+  <input type="date" id="noHouseDate">
 </div>
 
 <button type="button" onclick="calculateScore()">계산하기</button>
@@ -116,25 +98,33 @@ function calculateScore() {
   const familyCount = parseInt(document.getElementById('familyCount').value) || 0;
   const housingExp = document.getElementById('housingExperience').value;
 
+  if (!birth || !subDate) { alert("생년월일과 청약통장 가입일을 입력하세요."); return; }
+
+  // 만 30세 기준일
+  let age30Date = new Date(birth);
+  age30Date.setFullYear(age30Date.getFullYear() + 30);
+
   let startDate;
+
   if (housingExp === 'none') {
     if (maritalStatus === 'married') {
-      const marriageDate = new Date(document.getElementById('marriageDate').value);
-      if (!marriageDate) { alert('혼인신고일을 입력하세요'); return; }
-      startDate = marriageDate;
+      const marriageDateInput = document.getElementById('marriageDate').value;
+      if (!marriageDateInput) { alert('혼인신고일을 입력하세요'); return; }
+      const marriageDate = new Date(marriageDateInput);
+      // 혼인신고일과 만30세 중 더 빠른 날짜 선택
+      startDate = marriageDate < age30Date ? marriageDate : age30Date;
     } else {
-      startDate = new Date(birth);
-      startDate.setFullYear(startDate.getFullYear() + 30);
+      startDate = age30Date;
     }
   } else {
-    const purchaseDate = new Date(document.getElementById('purchaseDate').value);
-    if (!purchaseDate) { alert('주택 구입일을 입력하세요'); return; }
-    startDate = purchaseDate;
+    const noHouseDate = new Date(document.getElementById('noHouseDate').value);
+    if (!noHouseDate) { alert('무주택자가 된 날짜를 입력하세요'); return; }
+    startDate = noHouseDate;
   }
 
   const today = new Date();
 
-  // 무주택 기간 점수
+  // 무주택 기간 점수 (최대 32점)
   let housingYears = today.getFullYear() - startDate.getFullYear();
   let housingMonths = today.getMonth() - startDate.getMonth();
   if (housingMonths < 0) { housingYears--; housingMonths += 12; }
