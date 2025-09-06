@@ -10,13 +10,21 @@
   h1 { text-align: center; color: #333; font-size: 1.5em; margin-bottom: 20px; }
   label { display: block; font-weight: 600; margin-top: 15px; color: #555; }
   input[type="text"], input[type="number"], input[type="date"], select {
-    margin-top: 8px; padding: 12px; width: 100%; box-sizing: border-box;
-    border: 1px solid #ccc; border-radius: 8px; font-size: 1em;
+    margin-top: 8px;
+    padding: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
   }
   select {
-    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     background: #fff url('data:image/svg+xml;utf8,<svg fill="%23999" height="12" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 12px center;
-    background-size: 12px; padding-right: 36px;
+    background-size: 12px;
+    padding-right: 36px;
   }
   button { margin-top: 15px; background-color: #007BFF; color: #fff; font-weight: 600; border: none; cursor: pointer; transition: background 0.3s; padding: 12px; width: 100%; border-radius: 8px; font-size: 1em; }
   button:hover { background-color: #0056b3; }
@@ -52,7 +60,7 @@
 <label>부양가족 수 (본인 제외)</label>
 <input type="number" id="familyCount" min="0" value="0">
 
-<label>무주택 기간 계산</label>
+<label>주택 경험 여부</label>
 <select id="housingExperience" onchange="toggleHousingInput()">
   <option value="none">주택 구매 경험 없음</option>
   <option value="has">주택 구매 경험 있음</option>
@@ -69,7 +77,6 @@
 </div>
 
 <script>
-// 오늘 날짜를 yyyy-mm-dd 형식으로 구함
 const todayStr = new Date().toISOString().split("T")[0];
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('input[type="date"]').forEach(input => {
@@ -106,9 +113,10 @@ function calculateScore() {
       const marriageDateInput = document.getElementById('marriageDate').value;
       if (!marriageDateInput) { alert('혼인신고일을 입력하세요'); return; }
       const marriageDate = new Date(marriageDateInput);
+      // 주택 경험 없음: 무주택 시작일 = 만30세 기준일과 혼인신고일 중 **더 이른 날짜**
       startDate = marriageDate < age30Date ? marriageDate : age30Date;
     } else {
-      startDate = age30Date;
+      startDate = age30Date; // 미혼이면 만30세 기준
     }
   } else {
     const noHouseDate = new Date(document.getElementById('noHouseDate').value);
@@ -117,33 +125,25 @@ function calculateScore() {
   }
 
   const today = new Date();
-  const totalMonths = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
 
-  // ✅ 무주택 기간 점수 (공식표)
-  let housingScore = 0;
-  if (totalMonths < 12) housingScore = 2;
-  else if (totalMonths < 24) housingScore = 4;
-  else if (totalMonths < 36) housingScore = 8;
-  else if (totalMonths < 48) housingScore = 12;
-  else if (totalMonths < 60) housingScore = 16;
-  else if (totalMonths < 72) housingScore = 20;
-  else if (totalMonths < 84) housingScore = 24;
-  else if (totalMonths < 96) housingScore = 28;
-  else housingScore = 32;
+  // 무주택 기간 점수 (연 단위 2점, 6개월 이상 1점, 최대 32점)
+  let totalMonths = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
+  if (today.getDate() < startDate.getDate()) totalMonths--;
+  const fullYears = Math.floor(totalMonths / 12);
+  const extraMonths = totalMonths % 12;
+  const housingScore = Math.min(fullYears * 2 + (extraMonths >= 6 ? 1 : 0), 32);
 
-  // ✅ 청약통장 가입기간 점수 (1년 1점, 최대 17점)
-  const subYears = today.getFullYear() - subDate.getFullYear();
-  const subMonths = today.getMonth() - subDate.getMonth();
-  let subTotalYears = subYears + (subMonths >= 0 ? 0 : -1);
-  if (subTotalYears >= 15) subTotalYears = 17;
-  const subScore = Math.min(subTotalYears, 17);
+  // 청약통장 가입기간 점수 (연 단위 1점, 최대 17점)
+  let totalSubMonths = (today.getFullYear() - subDate.getFullYear()) * 12 + (today.getMonth() - subDate.getMonth());
+  if (today.getDate() < subDate.getDate()) totalSubMonths--;
+  const subYears = Math.floor(totalSubMonths / 12);
+  const subScore = Math.min(subYears, 17);
 
-  // ✅ 부양가족 점수 (본인 제외, 최대 35점)
+  // 부양가족 점수 (본인 제외, 5점씩, 최대 35점)
   const familyScore = Math.min(familyCount * 5, 35);
 
-  const totalScore = housingScore + subScore + familyScore;
+  const totalScore = housingScore + familyScore + subScore;
 
-  // ✅ 결과 표시 순서/명칭 수정
   document.getElementById('result').innerText = 
     `예상 청약 가점: ${totalScore}점\n(무주택: ${housingScore}, 부양가족: ${familyScore}, 청약통장: ${subScore})`;
 }
