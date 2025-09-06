@@ -83,6 +83,15 @@
 <div id="result"></div>
 </div>
 <script>
+// 오늘 날짜를 yyyy-mm-dd 형식으로 구함
+const todayStr = new Date().toISOString().split("T")[0];
+// 모든 date input에 max 속성 적용 (미래 입력 방지)
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('input[type="date"]').forEach(input => {
+    input.max = todayStr;
+  });
+});
+
 function toggleHousingInput() {
   const exp = document.getElementById('housingExperience').value;
   document.getElementById('housingInput').style.display = exp === 'has' ? 'block' : 'none';
