@@ -1,144 +1,191 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>청약 가점 계산기</title>
 <style>
-  body { font-family: 'Noto Sans KR', Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 0; }
-  .container { max-width: 500px; margin: 20px auto; background: #fff; padding: 20px 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-  h1 { text-align: center; color: #333; font-size: 1.5em; margin-bottom: 20px; }
-  label { display: block; font-weight: 600; margin-top: 15px; color: #555; }
-  input[type="text"], input[type="number"], input[type="date"], select {
-    margin-top: 8px;
-    padding: 12px;
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1em;
+  body {font-family: 'Noto Sans KR', Arial, sans-serif; background:#f5f5f5; margin:0; padding:0;}
+  .wrap{max-width:640px;margin:22px auto;padding:22px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.06);}
+  h1{margin:0 0 12px;font-size:1.3rem;text-align:center;color:#222}
+  label{display:block;margin-top:12px;font-weight:600;color:#444}
+  input[type="date"], input[type="number"], select, button {
+    margin-top:8px;padding:11px;border:1px solid #ddd;border-radius:8px;width:100%;box-sizing:border-box;font-size:1rem;
   }
-  select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background: #fff url('data:image/svg+xml;utf8,<svg fill="%23999" height="12" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 12px center;
-    background-size: 12px;
-    padding-right: 36px;
-  }
-  button { margin-top: 15px; background-color: #007BFF; color: #fff; font-weight: 600; border: none; cursor: pointer; transition: background 0.3s; padding: 12px; width: 100%; border-radius: 8px; font-size: 1em; }
-  button:hover { background-color: #0056b3; }
-  #result { margin-top: 25px; padding: 15px; background: #e0f7fa; border-radius: 10px; font-size: 1.2em; font-weight: bold; text-align: center; color: #007BFF; white-space: pre-line; }
-  @media (max-width: 480px) { 
-    .container { padding: 15px 20px; } 
-    h1 { font-size: 1.3em; } 
-  }
+  select{appearance:none;background:#fff url('data:image/svg+xml;utf8,<svg fill="%23999" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 12px center;background-size:12px;padding-right:40px}
+  button{background:#007BFF;color:#fff;border:0;border-radius:8px;padding:12px;margin-top:16px;font-weight:700;cursor:pointer}
+  #result{margin-top:16px;padding:14px;border-radius:10px;background:#eef8ff;color:#0457a3;white-space:pre-line;font-weight:700}
+  .note{margin-top:10px;color:#666;font-size:0.9rem}
+  @media (max-width:480px){.wrap{padding:14px}}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>청약 가점 계산기</h1>
-<form id="calculator">
+  <div class="wrap">
+    <h1>청약 가점 계산기</h1>
 
-<label>생년월일 (필수)</label>
-<input type="date" id="birthDate" required>
+    <label>계산 기준일 (공고/접수 기준일, 기본: 오늘)</label>
+    <input type="date" id="referenceDate">
 
-<label>청약통장 가입일 (필수)</label>
-<input type="date" id="subscriptionDate" required>
+    <label>생년월일</label>
+    <input type="date" id="birthDate" required>
 
-<label>혼인 여부</label>
-<select id="maritalStatus" onchange="toggleMarriageInput()">
-  <option value="single">미혼</option>
-  <option value="married">기혼</option>
-</select>
+    <label>청약통장 가입일</label>
+    <input type="date" id="subscriptionDate" required>
 
-<div id="marriageInput" style="display:none;">
-  <label>혼인신고일</label>
-  <input type="date" id="marriageDate">
-</div>
+    <label>혼인 여부</label>
+    <select id="maritalStatus" onchange="toggleMarriageInput()">
+      <option value="single">미혼</option>
+      <option value="married">기혼</option>
+    </select>
 
-<label>부양가족 수 (본인 제외)</label>
-<input type="number" id="familyCount" min="0" value="0">
+    <div id="marriageBlock" style="display:none">
+      <label>혼인신고일</label>
+      <input type="date" id="marriageDate">
+    </div>
 
-<label>주택 경험 여부</label>
-<select id="housingExperience" onchange="toggleHousingInput()">
-  <option value="none">주택 구매 경험 없음</option>
-  <option value="has">주택 구매 경험 있음</option>
-</select>
+    <label>부양가족 수 (본인 제외)</label>
+    <input type="number" id="familyCount" min="0" value="0">
 
-<div id="housingInput" style="display:none;">
-  <label>무주택자가 된 날짜 (마지막 주택 처분일)</label>
-  <input type="date" id="noHouseDate">
-</div>
+    <label>주택 경험 여부</label>
+    <select id="housingExperience" onchange="toggleHousingInput()">
+      <option value="none">주택 구매 경험 없음</option>
+      <option value="has">주택 구매 경험 있음</option>
+    </select>
 
-<button type="button" onclick="calculateScore()">계산하기</button>
-</form>
-<div id="result"></div>
-</div>
+    <div id="noHouseBlock" style="display:none">
+      <label>무주택자가 된 날짜 (마지막 주택 처분일)</label>
+      <input type="date" id="noHouseDate">
+    </div>
+
+    <button type="button" onclick="calculate()">계산하기</button>
+
+    <div id="result" style="display:none"></div>
+  </div>
 
 <script>
-const todayStr = new Date().toISOString().split("T")[0];
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll('input[type="date"]').forEach(input => {
-    input.max = todayStr;
-  });
+/* 유틸: yyyy-mm-dd 오늘 문자열 & 날짜 max 설정 */
+const todayStr = new Date().toISOString().slice(0,10);
+document.addEventListener('DOMContentLoaded', () => {
+  // 기본 참조일을 오늘로 설정
+  const ref = document.getElementById('referenceDate');
+  ref.value = todayStr;
+  // 모든 date 인풋에 max 속성 적용 (미래 입력 방지)
+  document.querySelectorAll('input[type="date"]').forEach(i => i.max = todayStr);
 });
 
-function toggleHousingInput() {
-  const exp = document.getElementById('housingExperience').value;
-  document.getElementById('housingInput').style.display = exp === 'has' ? 'block' : 'none';
+function toggleMarriageInput(){
+  document.getElementById('marriageBlock').style.display = document.getElementById('maritalStatus').value === 'married' ? 'block' : 'none';
 }
-function toggleMarriageInput() {
-  const status = document.getElementById('maritalStatus').value;
-  document.getElementById('marriageInput').style.display = status === 'married' ? 'block' : 'none';
+function toggleHousingInput(){
+  document.getElementById('noHouseBlock').style.display = document.getElementById('housingExperience').value === 'has' ? 'block' : 'none';
 }
 
-function calculateScore() {
-  const birth = new Date(document.getElementById('birthDate').value);
-  const subDate = new Date(document.getElementById('subscriptionDate').value);
-  const maritalStatus = document.getElementById('maritalStatus').value;
-  const familyCount = parseInt(document.getElementById('familyCount').value) || 0;
+/* 개월수 계산 (end >= start 가정) */
+function monthsBetween(start, end){
+  let months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+  if (end.getDate() < start.getDate()) months--;
+  return Math.max(0, months);
+}
+
+/* 점수 계산: 사용자 요구한 표 그대로 반영 */
+function calculate(){
+  const refVal = document.getElementById('referenceDate').value || todayStr;
+  const refDate = new Date(refVal);
+
+  const birthVal = document.getElementById('birthDate').value;
+  const subVal = document.getElementById('subscriptionDate').value;
+  const marital = document.getElementById('maritalStatus').value;
+  const familyCount = Math.max(0, parseInt(document.getElementById('familyCount').value) || 0);
   const housingExp = document.getElementById('housingExperience').value;
 
-  if (!birth || !subDate) { alert("생년월일과 청약통장 가입일을 입력하세요."); return; }
+  if (!birthVal || !subVal) { alert('생년월일과 청약통장 가입일을 입력하세요.'); return; }
+  const birth = new Date(birthVal);
+  const subDate = new Date(subVal);
 
-  // 만 30세 기준일
-  let age30Date = new Date(birth);
-  age30Date.setFullYear(age30Date.getFullYear() + 30);
+  // 기본 유효성
+  if (birth > refDate) { alert('생년월일이 기준일보다 이후입니다.'); return; }
+  if (subDate > refDate) { alert('청약통장 가입일이 기준일보다 이후입니다.'); return; }
 
-  let startDate;
+  // 만 30세 도달일
+  const age30 = new Date(birth);
+  age30.setFullYear(age30.getFullYear() + 30);
 
-  if (housingExp === 'none') {
-    // 주택 경험 없음 → 무주택 시작일은 **무조건 만 30세 기준일**
-    startDate = age30Date;
+  let startDate = null;
+  // 결정: 무주택 시작일 (주택 경험 여부 / 혼인여부 규칙)
+  if (housingExp === 'has') {
+    const noHouseVal = document.getElementById('noHouseDate').value;
+    if (!noHouseVal) { alert('주택 경험이 있는 경우 무주택자가 된 날짜를 입력하세요.'); return; }
+    const noHouse = new Date(noHouseVal);
+    if (noHouse > refDate) { alert('무주택자가 된 날짜가 기준일보다 이후입니다.'); return; }
+    startDate = noHouse;
   } else {
-    const noHouseDate = new Date(document.getElementById('noHouseDate').value);
-    if (!noHouseDate) { alert('무주택자가 된 날짜를 입력하세요'); return; }
-    startDate = noHouseDate;
+    // 주택 경험 없음
+    if (marital === 'married') {
+      const marriageVal = document.getElementById('marriageDate').value;
+      if (!marriageVal) { alert('기혼의 경우 혼인신고일을 입력하세요.'); return; }
+      const marriageDate = new Date(marriageVal);
+      if (marriageDate > refDate) { alert('혼인신고일이 기준일보다 이후입니다.'); return; }
+      // 기혼일 때: 혼인신고일과 만30세 도달일 중 더 빠른 날짜를 사용
+      startDate = (marriageDate < age30) ? marriageDate : age30;
+    } else {
+      // 미혼: 만30세가 기준일보다 이전인지 확인
+      if (refDate < age30) {
+        // 30세 미만 미혼 무주택자 → 0점(요청 규칙)
+        startDate = null; // 표식으로 0점 처리
+      } else {
+        startDate = age30;
+      }
+    }
   }
 
-  const today = new Date();
+  // 무주택 점수 계산 (요구한 표)
+  let housingScore = 0;
+  let startUsedStr = '-';
+  let totalMonths = 0;
+  if (startDate === null) {
+    housingScore = 0;
+  } else {
+    // 만약 startDate > refDate (미래)면 0
+    if (startDate > refDate) {
+      housingScore = 0;
+    } else {
+      totalMonths = monthsBetween(startDate, refDate); // 정수 개월
+      startUsedStr = startDate.toISOString().slice(0,10);
+      if (totalMonths === 0) {
+        housingScore = 0;
+      } else {
+        // months >=1 => 점수 = 2 * (floor(months/12) + 1), cap 32
+        housingScore = Math.min(32, 2 * (Math.floor(totalMonths / 12) + 1));
+      }
+    }
+  }
 
-  // 무주택 기간 점수 (연 단위 2점, 6개월 이상 1점, 최대 32점)
-  let totalMonths = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
-  if (today.getDate() < startDate.getDate()) totalMonths--;
-  const fullYears = Math.floor(totalMonths / 12);
-  const extraMonths = totalMonths % 12;
-  const housingScore = Math.min(fullYears * 2 + (extraMonths >= 6 ? 1 : 0), 32);
+  // 가족 점수: 사용자 표 (본인 제외 입력)
+  // 0명 -> 5점, 1명->10, ... 6명 이상 ->35
+  let familyScore = Math.min(35, (familyCount + 1) * 5);
 
-  // 청약통장 가입기간 점수 (연 단위 1점, 최대 17점)
-  let totalSubMonths = (today.getFullYear() - subDate.getFullYear()) * 12 + (today.getMonth() - subDate.getMonth());
-  if (today.getDate() < subDate.getDate()) totalSubMonths--;
-  const subYears = Math.floor(totalSubMonths / 12);
-  const subScore = Math.min(subYears, 17);
+  // 가입기간 점수: 사용자 표 (6개월 미만 1점, 6개월 이상~1년미만 2점, 1년 이상~2년미만 3점, ...)
+  const subMonths = monthsBetween(subDate, refDate);
+  let subScore = 0;
+  if (subMonths < 6) {
+    subScore = 1;
+  } else {
+    // subScore = floor(subMonths/12) + 2, capped at 17
+    subScore = Math.min(17, Math.floor(subMonths / 12) + 2);
+  }
 
-  // 부양가족 점수 (본인 제외, 5점씩, 최대 35점)
-  const familyScore = Math.min(familyCount * 5, 35);
+  const total = housingScore + familyScore + subScore;
 
-  const totalScore = housingScore + familyScore + subScore;
+  // 출력 - 자세한 내역
+  const resultEl = document.getElementById('result');
+  resultEl.style.display = 'block';
+  resultEl.textContent =
+`- 계산 기준일: ${refDate.toISOString().slice(0,10)}
+- 무주택 시작일(사용된 날짜): ${startUsedStr}  (기간: ${Math.floor(totalMonths/12)}년 ${totalMonths%12}개월) → ${housingScore}점
+- 부양가족: ${familyCount}명 (본인 제외) → ${familyScore}점
+- 청약통장 가입기간: ${Math.floor(subMonths/12)}년 ${subMonths%12}개월 → ${subScore}점
 
-  document.getElementById('result').innerText = 
-    `예상 청약 가점: ${totalScore}점\n(무주택: ${housingScore}, 부양가족: ${familyScore}, 청약통장: ${subScore})`;
+*총점: ${total}점  (무주택 ${housingScore} + 부양가족 ${familyScore} +청약통장 ${subScore})`;
 }
 </script>
 </body>
